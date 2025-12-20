@@ -2,6 +2,7 @@ import random
 
 import torch
 import os
+from tqdm import trange
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -115,18 +116,33 @@ class InfoNCESpatioTemporalTrainer(Trainer):
         self.log_results(epoch, epoch_loss1 / steps, epoch_loss2 / steps, epoch_loss / steps, prefix=mode)
         if mode == "val":
             self.early_stopper(-epoch_loss / steps, self.encoder)
+        return epoch_loss / steps
 
     def train(self, tr_eps, val_eps):
         # TODO: Make it work for all modes, right now only it defaults to pcl.
-        for e in range(self.epochs):
+        pbar = trange(self.epochs, desc="Epochs")
+        for e in pbar:
             self.encoder.train(), self.classifier1.train(), self.classifier2.train()
-            self.do_one_epoch(e, tr_eps)
+            train_loss = self.do_one_epoch(e, tr_eps)
 
             self.encoder.eval(), self.classifier1.eval(), self.classifier2.eval()
-            self.do_one_epoch(e, val_eps)
+            val_loss = self.do_one_epoch(e, val_eps)
+
+            last_lr = self.optimizer.param_groups[0]['lr'] if len(self.optimizer.param_groups) > 0 else 0.0
+            best_val = self.early_stopper.val_acc_max if hasattr(self.early_stopper, 'val_acc_max') else 0.0
+            best_step = e - self.early_stopper.counter if hasattr(self.early_stopper, 'counter') else 0
+
+            pbar.set_postfix({
+                'train_loss': f'{train_loss:.4f}',
+                'val_loss': f'{val_loss:.4f}',
+                'best_val': f'{best_val:.4f}',
+                'best_step': f'{best_step}',
+                'lr': f'{last_lr:.2e}'
+            })
 
             if self.early_stopper.early_stop:
                 break
+
         torch.save(self.encoder.state_dict(), os.path.join(self.wandb.run.dir, self.config['env_name'] + '.pt'))
 
     def log_results(self, epoch_idx, epoch_loss1, epoch_loss2, epoch_loss, prefix=""):
