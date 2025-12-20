@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from a2c_ppo_acktr.utils import init
-
+#from a2c_ppo_acktr.utils import init
+#from utils import init
 
 class Flatten(nn.Module):
     def forward(self, x):

@@ -1,4 +1,5 @@
-gym[atari]
+gymnasium[atari]
 wandb
 opencv-python
 scikit-learn
+stable-baselines3[extra]

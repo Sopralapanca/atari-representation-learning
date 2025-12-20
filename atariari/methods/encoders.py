@@ -1,11 +1,22 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from a2c_ppo_acktr.utils import init
 import time
 from atariari.benchmark.utils import download_run
 from atariari.benchmark.episodes import checkpointed_steps_full_sorted
 import os
+from .utils import init
+
+# def init(module, weight_init, bias_init, gain=1):
+#     """
+#     Helper function to initialize module weights and biases.
+#     Replacement for a2c_ppo_acktr.utils.init
+#     """
+#     weight_init(module.weight.data, gain=gain)
+#     if module.bias is not None:
+#         bias_init(module.bias.data)
+#     return module
+
 
 class Flatten(nn.Module):
     def forward(self, x):
@@ -93,6 +104,7 @@ class ImpalaCNN(nn.Module):
 
         return out
 
+
 class NatureCNN(nn.Module):
 
     def __init__(self, input_channels, args):
@@ -103,6 +115,8 @@ class NatureCNN(nn.Module):
         self.input_channels = input_channels
         self.end_with_relu = args.end_with_relu
         self.args = args
+        
+        # Initialize function using our standalone init
         init_ = lambda m: init(m,
                                nn.init.orthogonal_,
                                lambda x: nn.init.constant_(x, 0),
@@ -121,7 +135,6 @@ class NatureCNN(nn.Module):
                 nn.ReLU(),
                 Flatten(),
                 init_(nn.Linear(self.final_conv_size, self.feature_size)),
-                #nn.ReLU()
             )
         else:
             self.final_conv_size = 64 * 9 * 6
@@ -137,7 +150,6 @@ class NatureCNN(nn.Module):
                 nn.ReLU(),
                 Flatten(),
                 init_(nn.Linear(self.final_conv_size, self.feature_size)),
-                #nn.ReLU()
             )
         self.train()
 
@@ -161,8 +173,14 @@ class NatureCNN(nn.Module):
         return out
 
 
-
 class PPOEncoder(nn.Module):
+    """
+    Encoder that loads a pretrained PPO model checkpoint.
+    
+    Note: This assumes the PPO model checkpoint is compatible.
+    If you encounter issues loading checkpoints, you may need to ensure
+    the checkpoint was saved with compatible pytorch-a2c-ppo-acktr-gail code.
+    """
     def __init__(self, env_name, checkpoint_index):
         super().__init__()
         checkpoint_step = checkpointed_steps_full_sorted[checkpoint_index]
@@ -171,9 +189,18 @@ class PPOEncoder(nn.Module):
             time.sleep(5)
 
         self.masks = torch.zeros(1, 1)
+        
+        # Load the checkpoint
+        # The checkpoint format is: (actor_critic_model, observation_running_mean_std)
         self.ppo_model, ob_rms = torch.load(filepath, map_location=lambda storage, loc: storage)
 
     def forward(self, x):
+        """
+        Forward pass through the PPO encoder.
+        
+        Note: This assumes the ppo_model has an 'act' method that returns:
+        (value, action, action_log_prob, recurrent_hidden_states, feature_vectors, dist_entropy)
+        """
         _, _, _, _, feature_vectors, _ = self.ppo_model.act(x,
                                                             None,
                                                             self.masks,

@@ -6,8 +6,6 @@ import subprocess
 import torch
 import numpy as np
 from sklearn.metrics import f1_score as compute_f1_score
-from a2c_ppo_acktr.envs import make_vec_envs
-from a2c_ppo_acktr.utils import get_vec_normalize
 from collections import defaultdict
 
 # methods that need encoder trained before
@@ -95,6 +93,29 @@ def get_argparser():
     parser.add_argument('--num-runs', type=int, default=1)
     return parser
 
+def get_vec_normalize(venv):
+    """
+    Helper function to extract VecNormalize wrapper from a vectorized environment.
+    Walks through the wrapper chain to find VecNormalize.
+    """
+    if hasattr(venv, 'venv'):
+        # Check if current wrapper is VecNormalize
+        if venv.__class__.__name__ == 'VecNormalize':
+            return venv
+        # Recursively check wrapped environments
+        return get_vec_normalize(venv.venv)
+    return None
+
+
+def init(module, weight_init, bias_init, gain=1):
+    """
+    Helper function to initialize module weights and biases.
+    Replacement for a2c_ppo_acktr.utils.init
+    """
+    weight_init(module.weight.data, gain=gain)
+    if module.bias is not None:
+        bias_init(module.bias.data)
+    return module
 
 def set_seeds(seed):
     torch.manual_seed(seed)
@@ -145,9 +166,12 @@ def save_model(model, envs, save_dir, model_name, use_cuda):
 
 
 def evaluate_policy(actor_critic, envs, args, eval_log_dir, device):
+    # Note: This function may need to be updated based on actual usage
+    # Original used a2c_ppo_acktr's make_vec_envs with different signature
+    from atariari.benchmark.envs import make_vec_envs
     eval_envs = make_vec_envs(
         args.env_name, args.seed + args.num_processes, args.num_processes,
-        args.gamma, eval_log_dir, args.add_timestep, device, True)
+        device=device)
 
     vec_norm = get_vec_normalize(eval_envs)
     if vec_norm is not None:

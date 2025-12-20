@@ -1,11 +1,11 @@
-import gym
+import gymnasium as gym
 from .ram_annotations import atari_dict
 
 
 class InfoWrapper(gym.Wrapper):
     def step(self, action):
-        observation, reward, done, info = self.env.step(action)
-        return observation, reward, done, self.info(info)
+        observation, reward, terminated, truncated, info = self.env.step(action)
+        return observation, reward, terminated, truncated, self.info(info)
 
     def reset(self, **kwargs):
         return self.env.reset(**kwargs)
