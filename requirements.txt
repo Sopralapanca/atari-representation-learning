@@ -3,3 +3,4 @@ wandb
 opencv-python
 scikit-learn
 stable-baselines3[extra]
+tqdm
