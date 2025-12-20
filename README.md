@@ -4,6 +4,12 @@ Ankesh Anand*, Evan Racah*, Sherjil Ozair*, Yoshua Bengio, Marc-Alexandre Côté
 
 This repo provides code for the benchmark and techniques introduced in the paper [Unsupervised State Representation Learning in Atari](https://arxiv.org/abs/1906.08226)
 
+**⚠️ Compatibility notice — gymnasium now used**
+
+- This codebase has been updated to use **gymnasium** (with **ale-py**) instead of the older `gym` package.
+- Support for `openai baselines` and `pytorch-a2c-ppo-acktr-gail` has been removed; the project includes standalone replacements for required wrappers and utilities.
+- If you previously relied on those packages, update your environment per the installation instructions below or reinstall the package from the local workspace.
+
 * [📦 Install ](#install) -- Install relevant dependencies and the project
 * [🔧 Usage ](#usage) -- Learn how to use AtariARI and train representations with Spatio-Temporal DeepInfomax (ST-DIM)
 * [🕹️ RAM Annotations ](atariari/benchmark/ram_annotations.py) -- Mapping of RAM indexes to semantic state variables
@@ -31,14 +37,24 @@ conda install scikit-learn
 # Baselines for Atari preprocessing
 # Tensorflow is a dependency, but you don't need to install the GPU version
 conda install tensorflow
-pip install git+git://github.com/openai/baselines
+~~pip install git+git://github.com/openai/baselines~~
 
-# pytorch-a2c-ppo-acktr for RL utils
-pip install git+git://github.com/ankeshanand/pytorch-a2c-ppo-acktr-gail
+~~# pytorch-a2c-ppo-acktr for RL utils~~
+~~pip install git+git://github.com/ankeshanand/pytorch-a2c-ppo-acktr-gail~~
 
-# Clone and install our package
+## Simplified install
+
+Run the single command below to install required Python dependencies and this package:
+
+```bash
 pip install -r requirements.txt
-pip install git+git://github.com/mila-iqia/atari-representation-learning.git
+```
+
+Or install editable from source for development:
+
+```bash
+pip install -e .
+```
 ```
 
 ## Usage 
