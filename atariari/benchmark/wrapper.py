@@ -1,4 +1,4 @@
-import gymnasium as gym
+from atariari.gym import gym
 from .ram_annotations import atari_dict
 
 

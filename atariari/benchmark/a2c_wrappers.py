@@ -5,7 +5,7 @@ Save this as: atariari/benchmark/a2c_wrappers.py
 """
 
 import torch
-import gymnasium as gym
+from atariari.gym import gym
 import numpy as np
 from gymnasium import spaces
 from stable_baselines3.common.vec_env import VecEnvWrapper

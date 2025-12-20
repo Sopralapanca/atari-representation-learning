@@ -1,7 +1,7 @@
 import cv2
 from gymnasium import spaces
 from gymnasium.wrappers import TimeLimit
-import gymnasium as gym
+from atariari.gym import gym
 import numpy as np
 import torch
 from pathlib import Path

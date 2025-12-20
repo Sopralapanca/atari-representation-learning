@@ -13,10 +13,8 @@ def test_imports():
     print("=" * 60)
     
     try:
-        import gymnasium as gym
-        import ale_py
-        gym.register_envs(ale_py)
-        print("✓ gymnasium imported successfully")
+        from atariari.gym import gym
+        print("✓ gymnasium imported successfully (via atariari.gym)")
     except ImportError as e:
         print(f"✗ gymnasium import failed: {e}")
         return False
