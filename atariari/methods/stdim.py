@@ -118,7 +118,7 @@ class InfoNCESpatioTemporalTrainer(Trainer):
     def train(self, tr_eps, val_eps, val_interval=1):
         # TODO: Make it work for all modes, right now only it defaults to pcl.        
         pbar = tqdm.tqdm(range(self.epochs), desc="Training Epochs")
-        
+        val_loss = 0.0
         # use tqdm
         for e in pbar:
             self.encoder.train(), self.classifier1.train(), self.classifier2.train()
