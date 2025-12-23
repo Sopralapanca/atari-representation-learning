@@ -1,9 +1,6 @@
-import random
-
 import torch
 import os
-from tqdm import trange
-import torch
+import tqdm
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
@@ -118,15 +115,18 @@ class InfoNCESpatioTemporalTrainer(Trainer):
             self.early_stopper(-epoch_loss / steps, self.encoder)
         return epoch_loss / steps
 
-    def train(self, tr_eps, val_eps):
-        # TODO: Make it work for all modes, right now only it defaults to pcl.
-        pbar = trange(self.epochs, desc="Epochs")
+    def train(self, tr_eps, val_eps, val_interval=1):
+        # TODO: Make it work for all modes, right now only it defaults to pcl.        
+        pbar = tqdm(range(self.epochs), desc="Training Epochs")
+        
+        # use tqdm
         for e in pbar:
             self.encoder.train(), self.classifier1.train(), self.classifier2.train()
             train_loss = self.do_one_epoch(e, tr_eps)
 
-            self.encoder.eval(), self.classifier1.eval(), self.classifier2.eval()
-            val_loss = self.do_one_epoch(e, val_eps)
+            if (e + 1) % val_interval == 0:
+                self.encoder.eval(), self.classifier1.eval(), self.classifier2.eval()
+                val_loss = self.do_one_epoch(e, val_eps)
 
             last_lr = self.optimizer.param_groups[0]['lr'] if len(self.optimizer.param_groups) > 0 else 0.0
             best_val = self.early_stopper.val_acc_max if hasattr(self.early_stopper, 'val_acc_max') else 0.0
