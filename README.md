@@ -1,10 +1,10 @@
 # Unsupervised State Representation Learning in Atari
 
-Ankesh Anand*, Evan Racah*, Sherjil Ozair*, Yoshua Bengio, Marc-Alexandre Côté, R Devon Hjelm
+Thanks to the original authors: Ankesh Anand*, Evan Racah*, Sherjil Ozair*, Yoshua Bengio, Marc-Alexandre Côté, R Devon Hjelm
 
 This repo provides code for the benchmark and techniques introduced in the paper [Unsupervised State Representation Learning in Atari](https://arxiv.org/abs/1906.08226)
 
-**⚠️ Compatibility notice — gymnasium now used**
+## **⚠️ Compatibility notice — gymnasium now used**
 
 - This codebase has been updated to use **gymnasium** (with **ale-py**) instead of the older `gym` package.
 - Support for `openai baselines` and `pytorch-a2c-ppo-acktr-gail` has been removed; the project includes standalone replacements for required wrappers and utilities.
@@ -21,42 +21,9 @@ This repo provides code for the benchmark and techniques introduced in the paper
 You can do a minimal install to get just the AtariARI (Atari Annotated RAM Interface) wrapper by doing:
 
 ```bash
-pip install 'gym[atari]'
-pip install git+git://github.com/mila-iqia/atari-representation-learning.git
+pip install git+https://github.com/Sopralapanca/atari-representation-learning.git
+pip install stable-baselines3[extra]
 ```
-This just requires `gym[atari]` and it gives you the ability to play around with the AtariARI wrapper.
-If you want to use the code for training representation learning methods and probing them, you will need a full installation:
-
-### Full installation (AtariARI Wrapper + Training & Probing Code)
-
-```bash
-# PyTorch and scikit learn
-conda install pytorch torchvision -c pytorch
-conda install scikit-learn
-
-# Baselines for Atari preprocessing
-# Tensorflow is a dependency, but you don't need to install the GPU version
-conda install tensorflow
-~~pip install git+git://github.com/openai/baselines~~
-
-~~# pytorch-a2c-ppo-acktr for RL utils~~
-~~pip install git+git://github.com/ankeshanand/pytorch-a2c-ppo-acktr-gail~~
-
-## Simplified install
-
-Run the single command below to install required Python dependencies and this package:
-
-```bash
-pip install -r requirements.txt
-```
-
-Or install editable from source for development:
-
-```bash
-pip install -e .
-```
-```
-
 ## Usage 
 ### Atari Annotated RAM Interface (AtariARI): 
 
